@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Skin Inspect Generator</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-radial"></div>
+    
+    <div class="container animate-fade-in">
+        <header>
+            <div class="logo">
+                <span class="gradient-text">CS2</span> Skin Generator
+            </div>
+            <p class="subtitle">Local Inspect Server Utility</p>
+        </header>
+
+        <main class="grid-layout">
+            <!-- Left Panel: Customizer -->
+            <section class="card glass-panel config-panel">
+                <h2>Customize Skin</h2>
+                
+                <!-- Weapon Selection -->
+                <div class="input-group">
+                    <label for="weapon-select">Weapon / Knife</label>
+                    <select id="weapon-select">
+                        <optgroup label="Pistols">
+                            <option value="4" selected>Glock-18 (4)</option>
+                            <option value="61">USP-S (61)</option>
+                            <option value="32">P2000 (32)</option>
+                            <option value="2">Dual Berettas (2)</option>
+                            <option value="36">P250 (36)</option>
+                            <option value="3">Five-SeveN (3)</option>
+                            <option value="30">Tec-9 (30)</option>
+                            <option value="63">CZ75-Auto (63)</option>
+                            <option value="1">Desert Eagle (1)</option>
+                            <option value="64">R8 Revolver (64)</option>
+                        </optgroup>
+                        <optgroup label="Rifles">
+                            <option value="7">AK-47 (7)</option>
+                            <option value="16">M4A4 (16)</option>
+                            <option value="60">M4A1-S (60)</option>
+                            <option value="9">AWP (9)</option>
+                            <option value="40">SSG 08 (40)</option>
+                            <option value="13">Galil AR (13)</option>
+                            <option value="10">FAMAS (10)</option>
+                            <option value="39">SG 553 (39)</option>
+                            <option value="8">AUG (8)</option>
+                            <option value="11">G3SG1 (11)</option>
+                            <option value="38">SCAR-20 (38)</option>
+                        </optgroup>
+                        <optgroup label="SMGs">
+                            <option value="17">MAC-10 (17)</option>
+                            <option value="34">MP9 (34)</option>
+                            <option value="33">MP7 (33)</option>
+                            <option value="23">MP5-SD (23)</option>
+                            <option value="24">UMP-45 (24)</option>
+                            <option value="19">P90 (19)</option>
+                            <option value="26">PP-Bizon (26)</option>
+                        </optgroup>
+                        <optgroup label="Heavy">
+                            <option value="35">Nova (35)</option>
+                            <option value="25">XM1014 (25)</option>
+                            <option value="29">Sawed-Off (29)</option>
+                            <option value="27">MAG-7 (27)</option>
+                            <option value="14">M249 (14)</option>
+                            <option value="28">Negev (28)</option>
+                        </optgroup>
+                        <optgroup label="Knives">
+                            <option value="507">Karambit (507)</option>
+                            <option value="515">Butterfly Knife (515)</option>
+                            <option value="508">M9 Bayonet (508)</option>
+                            <option value="500">Bayonet (500)</option>
+                            <option value="505">Flip Knife (505)</option>
+                            <option value="506">Gut Knife (506)</option>
+                            <option value="509">Huntsman Knife (509)</option>
+                            <option value="512">Falchion Knife (512)</option>
+                            <option value="514">Bowie Knife (514)</option>
+                            <option value="516">Shadow Daggers (516)</option>
+                            <option value="519">Ursus Knife (519)</option>
+                            <option value="520">Navaja Knife (520)</option>
+                            <option value="521">Nomad Knife (521)</option>
+                            <option value="522">Stiletto Knife (522)</option>
+                            <option value="523">Talon Knife (523)</option>
+                            <option value="525">Skeleton Knife (525)</option>
+                            <option value="503">Classic Knife (503)</option>
+                            <option value="517">Paracord Knife (517)</option>
+                            <option value="518">Survival Knife (518)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Paint Index & Seed -->
+                <div class="row-inputs">
+                    <div class="input-group" style="grid-column: span 2;">
+                        <label for="skin-search">Skin Search / Select Preset</label>
+                        <div class="dropdown-container">
+                            <input type="text" id="skin-search" placeholder="Search skin name (e.g. Case Hardened...)" autocomplete="off">
+                            <div class="dropdown-list hidden" id="skin-dropdown-list"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label for="paint-input">Paint Kit ID</label>
+                        <input type="number" id="paint-input" value="44" min="0" max="9999" placeholder="e.g. 44">
+                    </div>
+                    <div class="input-group">
+                        <label for="seed-input">Pattern Template (Seed)</label>
+                        <input type="number" id="seed-input" value="661" min="0" max="1000" placeholder="e.g. 661">
+                    </div>
+                </div>
+
+                <!-- Wear Slider -->
+                <div class="input-group">
+                    <div class="slider-header">
+                        <label for="wear-slider">Wear Float</label>
+                        <span id="wear-val">0.0500</span>
+                    </div>
+                    <input type="range" id="wear-slider" min="0" max="1" step="0.0001" value="0.05">
+                    <div class="wear-bands">
+                        <span class="band fn" data-wear="0.03">FN</span>
+                        <span class="band mw" data-wear="0.10">MW</span>
+                        <span class="band ft" data-wear="0.25">FT</span>
+                        <span class="band ww" data-wear="0.40">WW</span>
+                        <span class="band bs" data-wear="0.70">BS</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Output & Controls -->
+            <section class="card glass-panel output-panel">
+                <h2>Output Actions</h2>
+
+                <!-- Skin Preview Card -->
+                <div class="skin-preview-card">
+                    <img id="skin-preview-img" src="" alt="Skin Preview" class="hidden">
+                    <div id="skin-preview-placeholder" class="preview-placeholder">No skin selected</div>
+                    <div class="preview-details hidden" id="skin-preview-details">
+                        <div class="preview-title" id="preview-title">AK-47 | Case Hardened</div>
+                        <div class="preview-subtitle" id="preview-subtitle">Paint Kit 44</div>
+                    </div>
+                </div>
+
+                <!-- In-Game Command -->
+                <div class="code-box">
+                    <div class="code-header">
+                        <span>Direct In-Game Chat Command</span>
+                        <button class="btn btn-secondary btn-sm" id="btn-copy-gen" data-target="gen-command">Copy</button>
+                    </div>
+                    <div class="code-content font-mono" id="gen-command">!gen 4 44 661 0.0500</div>
+                </div>
+
+                <!-- Masked Inspect Link -->
+                <div class="code-box">
+                    <div class="code-header">
+                        <span>Masked Inspect Link (Hex Protobuf)</span>
+                        <button class="btn btn-secondary btn-sm" id="btn-copy-inspect" data-target="inspect-link">Copy</button>
+                    </div>
+                    <div class="code-content font-mono font-sm truncate-text" id="inspect-link">Generating link...</div>
+                </div>
+
+                <!-- Send directly to Game server (RCON) -->
+                <div class="rcon-panel">
+                    <h3>Send Directly to Your Player</h3>
+                    <p class="rcon-desc">Connects via local RCON to automatically replace and paint your weapon in real-time.</p>
+                    
+                    <div class="rcon-row">
+                        <input type="text" id="steamid-input" placeholder="Enter your SteamID64 (e.g. 76561198...)" value="">
+                        <button class="btn btn-primary" id="btn-send-server">Send to Server</button>
+                    </div>
+                    <div id="rcon-status" class="status-msg hidden"></div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Powered by local Node.js Server & CounterStrikeSharp</p>
+        </footer>
+    </div>
+
+    <!-- Script file -->
+    <script src="app.js"></script>
+</body>
+</html>

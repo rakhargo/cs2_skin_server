@@ -1,0 +1,19 @@
+{
+  "name": "cs2-inspect-server-backend",
+  "version": "1.0.0",
+  "description": "Backend API for CS2 Skin Inspect Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cs2-inspect-lib": "^2.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-cs2": "^2.2.4",
+    "rcon-client": "^4.2.3",
+    "steam-totp": "^2.1.2",
+    "steam-user": "^5.0.0"
+  }
+}

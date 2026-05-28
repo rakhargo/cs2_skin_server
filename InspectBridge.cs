@@ -86,7 +86,14 @@ public class InspectBridge : BasePlugin
 
     public override void Load(bool hotReload)
     {
-        Console.WriteLine($"[InspectBridge] Plugin Loaded! Support for !i (inspect) and !gen (direct input) enabled.");
+        Console.WriteLine($"[InspectBridge] Plugin Loaded! Support for !gen (direct input) and !unlimited round enabled.");
+
+        // Apply unlimited round settings on server startup/plugin load
+        Server.ExecuteCommand("mp_roundtime 60");
+        Server.ExecuteCommand("mp_roundtime_defuse 60");
+        Server.ExecuteCommand("mp_roundtime_hostage 60");
+        Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
+        Server.ExecuteCommand("mp_freezetime 0");
     }
 
     [ConsoleCommand("css_gen", "Generate a skin directly in game")]
@@ -120,6 +127,27 @@ public class InspectBridge : BasePlugin
         };
 
         ApplyInspectSkin(player, itemData);
+    }
+
+    [ConsoleCommand("css_unlimited", "Make the round time unlimited and restart game")]
+    [ConsoleCommand("css_u", "Make the round time unlimited and restart game")]
+    public void OnUnlimitedCommand(CCSPlayerController? player, CommandInfo command)
+    {
+        Server.ExecuteCommand("mp_roundtime 60");
+        Server.ExecuteCommand("mp_roundtime_defuse 60");
+        Server.ExecuteCommand("mp_roundtime_hostage 60");
+        Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
+        Server.ExecuteCommand("mp_freezetime 0");
+        Server.ExecuteCommand("mp_restartgame 1");
+
+        if (player != null && player.IsValid)
+        {
+            player.PrintToChat(" \x06[Inspect]\x01 Unlimited round time applied and game restarted!");
+        }
+        else
+        {
+            Console.WriteLine("[InspectBridge] Unlimited round time applied and game restarted!");
+        }
     }
 
     [ConsoleCommand("css_inspect_target", "Inspect a skin directly on a target player (for Web UI via RCON)")]

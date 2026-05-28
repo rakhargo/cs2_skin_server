@@ -13,9 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCopyGen = document.getElementById('btn-copy-gen');
     const btnCopyInspect = document.getElementById('btn-copy-inspect');
     
-    const steamIdInput = document.getElementById('steamid-input');
-    const btnSendServer = document.getElementById('btn-send-server');
-    const rconStatus = document.getElementById('rcon-status');
     const wearBands = document.querySelectorAll('.wear-bands .band');
 
     // New DOM Elements for Search & Preview
@@ -31,11 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let allSkins = [];
     let filteredSkins = [];
 
-    // Load persisted SteamID from LocalStorage
-    const savedSteamId = localStorage.getItem('cs2_inspect_steamid');
-    if (savedSteamId) {
-        steamIdInput.value = savedSteamId;
-    }
 
     // ==========================================
     // DATA LOADING & FILTERING
@@ -362,19 +354,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // CLIPBOARD COPY HANDLERS
-    // ==========================================
     [btnCopyGen, btnCopyInspect].forEach(btn => {
         btn.addEventListener('click', () => {
             const targetId = btn.getAttribute('data-target');
             const targetEl = document.getElementById(targetId);
             let textToCopy = targetEl.textContent;
-
-            // If copying masked link, prepend "!i " for chat command
-            if (targetId === 'inspect-link') {
-                textToCopy = `!i ${textToCopy}`;
-            }
 
             navigator.clipboard.writeText(textToCopy)
                 .then(() => {
@@ -394,69 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         });
     });
-
-    // ==========================================
-    // RCON SEND TO SERVER HANDLER
-    // ==========================================
-    btnSendServer.addEventListener('click', async () => {
-        const steamId = steamIdInput.value.trim();
-        const defindex = parseInt(weaponSelect.value);
-        const paintindex = parseInt(paintInput.value) || 0;
-        const paintseed = parseInt(seedInput.value) || 0;
-        const paintwear = parseFloat(wearSlider.value);
-
-        if (!steamId) {
-            showRconStatus('SteamID64 is required to send to server.', 'error');
-            return;
-        }
-
-        if (!/^\d{17}$/.test(steamId)) {
-            showRconStatus('SteamID64 must be a 17-digit number.', 'error');
-            return;
-        }
-
-        // Save SteamID for future visits
-        localStorage.setItem('cs2_inspect_steamid', steamId);
-
-        showRconStatus('Sending skin config to CS2 Server...', 'success');
-
-        try {
-            const response = await fetch('/api/send-to-server', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    steamId,
-                    defindex,
-                    paintindex,
-                    paintseed,
-                    paintwear
-                })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                showRconStatus('Success! Skin spawned in your hands.', 'success');
-            } else {
-                showRconStatus(data.error || 'Server rejected request.', 'error');
-            }
-        } catch (err) {
-            console.error('RCON POST error:', err);
-            showRconStatus('RCON connection failed. Check console or backend config.', 'error');
-        }
-    });
-
-    function showRconStatus(msg, type) {
-        rconStatus.textContent = msg;
-        rconStatus.className = `status-msg ${type}`;
-        
-        if (type === 'success' && !msg.includes('Sending')) {
-            setTimeout(() => {
-                rconStatus.className = 'status-msg hidden';
-            }, 4000);
-        }
-    }
 
     // Initialize Database on Page Load
     loadSkinsDatabase();

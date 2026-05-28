@@ -172,22 +172,13 @@
                 <!-- Masked Inspect Link -->
                 <div class="code-box">
                     <div class="code-header">
-                        <span>Masked Inspect Link (Hex Protobuf)</span>
+                        <span>Steam / Console Inspect Link</span>
                         <button class="btn btn-secondary btn-sm" id="btn-copy-inspect" data-target="inspect-link">Copy</button>
                     </div>
-                    <div class="code-content font-mono font-sm truncate-text" id="inspect-link">Generating link...</div>
-                </div>
-
-                <!-- Send directly to Game server (RCON) -->
-                <div class="rcon-panel">
-                    <h3>Send Directly to Your Player</h3>
-                    <p class="rcon-desc">Connects via local RCON to automatically replace and paint your weapon in real-time.</p>
-                    
-                    <div class="rcon-row">
-                        <input type="text" id="steamid-input" placeholder="Enter your SteamID64 (e.g. 76561198...)" value="">
-                        <button class="btn btn-primary" id="btn-send-server">Send to Server</button>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: -0.2rem; margin-bottom: 0.4rem; font-style: italic; line-height: 1.2;">
+                        Copies the raw steam:// URL directly to inspect via steam console or inventory. No !i prefix.
                     </div>
-                    <div id="rcon-status" class="status-msg hidden"></div>
+                    <div class="code-content font-mono font-sm truncate-text" id="inspect-link">Generating link...</div>
                 </div>
             </section>
         </main>

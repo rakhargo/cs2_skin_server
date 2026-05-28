@@ -184,7 +184,7 @@ app.get('/health', (req, res) => {
 
 // Inspect Endpoint (Decodes any link, either unmasked using Steam bot or masked offline)
 app.get('/inspect', authenticate, async (req, res) => {
-    const url = req.query.url;
+    let url = req.query.url;
     if (!url) {
         return res.status(400).json({ error: 'Bad Request: Missing "url" query parameter' });
     }
@@ -192,6 +192,18 @@ app.get('/inspect', authenticate, async (req, res) => {
     try {
         console.log(`[API] Received inspect request for URL: ${url}`);
         
+        // Normalize inspect link prefix to standard format so cs2-inspect-lib can parse it
+        try {
+            let decodedUrl = decodeURIComponent(url);
+            const previewIndex = decodedUrl.indexOf('+csgo_econ_action_preview');
+            if (previewIndex !== -1) {
+                const payload = decodedUrl.substring(previewIndex);
+                url = 'steam://rungame/730/76561202255233023/' + payload;
+            }
+        } catch (e) {
+            // Keep original if decoding fails
+        }
+
         const analysis = inspectServer.analyzeUrl(url);
         
         if (analysis.url_type === 'masked') {

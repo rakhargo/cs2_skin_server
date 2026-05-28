@@ -73,11 +73,11 @@ public class InspectBridge : BasePlugin
         { 512, "weapon_knife_falchion" },
         { 514, "weapon_knife_survival_bowie" },
         { 515, "weapon_knife_butterfly" },
-        { 516, "weapon_knife_push" },
-        { 517, "weapon_knife_cord" },
-        { 518, "weapon_knife_canis" },
+        { 516, "weapon_knife_push" }, // shadow daggers
+        { 517, "weapon_knife_cord" }, // paracord
+        { 518, "weapon_knife_canis" }, // kukri
         { 519, "weapon_knife_ursus" },
-        { 520, "weapon_knife_gypsy_jackknife" },
+        { 520, "weapon_knife_gypsy_jackknife" }, // navaja
         { 521, "weapon_knife_outdoor" },
         { 522, "weapon_knife_stiletto" },
         { 523, "weapon_knife_widowmaker" },
@@ -87,73 +87,6 @@ public class InspectBridge : BasePlugin
     public override void Load(bool hotReload)
     {
         Console.WriteLine($"[InspectBridge] Plugin Loaded! Support for !i (inspect) and !gen (direct input) enabled.");
-    }
-
-    [ConsoleCommand("css_i", "Inspect a skin link in-game")]
-    [ConsoleCommand("css_inspect", "Inspect a skin link in-game")]
-    public void OnInspectCommand(CCSPlayerController? player, CommandInfo command)
-    {
-        if (player == null || !player.IsValid || player.IsBot) return;
-
-        if (command.ArgCount < 2)
-        {
-            player.PrintToChat(" \x02[Inspect]\x01 Usage: !i <inspect_link>");
-            return;
-        }
-
-        string inspectUrl = command.ArgByIndex(1);
-        player.PrintToChat(" \x04[Inspect]\x01 Fetching skin details, please wait...");
-
-        // Run the HTTP API request in a background thread to prevent blocking the game server
-        Task.Run(async () =>
-        {
-            try
-            {
-                var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl + Uri.EscapeDataString(inspectUrl));
-                if (!string.IsNullOrEmpty(AuthKey))
-                {
-                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthKey);
-                }
-
-                var response = await _httpClient.SendAsync(request);
-                if (!response.IsSuccessStatusCode)
-                {
-                    string errorMsg = await response.Content.ReadAsStringAsync();
-                    Server.NextFrame(() =>
-                    {
-                        player.PrintToChat($" \x02[Inspect]\x01 API Error: Server returned {response.StatusCode}");
-                        Console.WriteLine($"[InspectBridge] API error: {errorMsg}");
-                    });
-                    return;
-                }
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var inspectResponse = JsonSerializer.Deserialize<InspectApiResponse>(responseBody);
-
-                if (inspectResponse == null || !inspectResponse.success || inspectResponse.data == null)
-                {
-                    Server.NextFrame(() =>
-                    {
-                        player.PrintToChat(" \x02[Inspect]\x01 Failed to decode inspect link. Ensure the link is correct.");
-                    });
-                    return;
-                }
-
-                // Return to the main CS2 server thread to safely modify game entities
-                Server.NextFrame(() =>
-                {
-                    ApplyInspectSkin(player, inspectResponse.data);
-                });
-            }
-            catch (Exception ex)
-            {
-                Server.NextFrame(() =>
-                {
-                    player.PrintToChat(" \x02[Inspect]\x01 Error: Unable to contact local inspect bot API.");
-                    Console.WriteLine($"[InspectBridge] Connection error: {ex.Message}");
-                });
-            }
-        });
     }
 
     [ConsoleCommand("css_gen", "Generate a skin directly in game")]

@@ -77,6 +77,7 @@ Open **`http://localhost:3000`** in your browser (or inside the Steam overlay br
 ### Step 5: Start CS2 and Test
 1. Start your CS2 Dedicated Server with RCON enabled:
    ```bash
+   cd cs2_server\game\bin\win64
    cs2.exe -dedicated -console +map de_mirage +rcon_password your_rcon_password
    ```
 2. Connect to the server in-game.

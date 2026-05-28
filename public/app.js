@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const paintInput = document.getElementById('paint-input');
     const seedInput = document.getElementById('seed-input');
     const wearSlider = document.getElementById('wear-slider');
-    const wearVal = document.getElementById('wear-val');
+    const wearInput = document.getElementById('wear-input');
+    const wearCapNote = document.getElementById('wear-cap-note');
     
     const genCommandDiv = document.getElementById('gen-command');
     const inspectLinkDiv = document.getElementById('inspect-link');
@@ -122,18 +123,25 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide dropdown
         skinDropdownList.classList.add('hidden');
         
-        // Adjust wear slider range to match skin's official floats
+        // Adjust wear input/slider limits to match skin's official floats
+        wearInput.min = skin.min_float.toFixed(4);
+        wearInput.max = skin.max_float.toFixed(4);
         wearSlider.min = skin.min_float.toFixed(4);
         wearSlider.max = skin.max_float.toFixed(4);
+        
+        // Update range note text
+        wearCapNote.textContent = `Range: ${skin.min_float.toFixed(4)} - ${skin.max_float.toFixed(4)} (${skin.pattern_name})`;
         
         // Clamp current wear value to match the new bounds if necessary
         let currentWear = parseFloat(wearSlider.value);
         if (currentWear < skin.min_float) {
             wearSlider.value = skin.min_float;
-            wearVal.textContent = skin.min_float.toFixed(4);
+            wearInput.value = skin.min_float.toFixed(4);
         } else if (currentWear > skin.max_float) {
             wearSlider.value = skin.max_float;
-            wearVal.textContent = skin.max_float.toFixed(4);
+            wearInput.value = skin.max_float.toFixed(4);
+        } else {
+            wearInput.value = currentWear.toFixed(4);
         }
 
         updatePreviewCard(skin);
@@ -150,14 +158,22 @@ document.addEventListener('DOMContentLoaded', () => {
             skinSearchInput.value = matchingSkin.pattern_name;
             updatePreviewCard(matchingSkin);
             
+            wearInput.min = matchingSkin.min_float.toFixed(4);
+            wearInput.max = matchingSkin.max_float.toFixed(4);
             wearSlider.min = matchingSkin.min_float.toFixed(4);
             wearSlider.max = matchingSkin.max_float.toFixed(4);
+            
+            wearCapNote.textContent = `Range: ${matchingSkin.min_float.toFixed(4)} - ${matchingSkin.max_float.toFixed(4)} (${matchingSkin.pattern_name})`;
         } else {
             skinSearchInput.value = '';
             clearPreviewCard();
             
+            wearInput.min = "0.0000";
+            wearInput.max = "1.0000";
             wearSlider.min = "0.0000";
             wearSlider.max = "1.0000";
+            
+            wearCapNote.textContent = "Range: 0.0000 - 1.0000 (Default)";
         }
 
         updateOutputs();
@@ -194,9 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
         paintInput.value = '0';
         clearPreviewCard();
         
-        // Reset slider bounds
+        // Reset slider and input bounds
+        wearInput.min = "0.0000";
+        wearInput.max = "1.0000";
         wearSlider.min = "0.0000";
         wearSlider.max = "1.0000";
+        
+        wearCapNote.textContent = "Range: 0.0000 - 1.0000 (Default)";
         
         filterSkinsForSelectedWeapon();
         updateOutputs();
@@ -224,10 +244,43 @@ document.addEventListener('DOMContentLoaded', () => {
     paintInput.addEventListener('input', handlePaintInputManualChange);
     paintInput.addEventListener('change', handlePaintInputManualChange);
 
-    // Update Wear Slider Label
+    // Update Wear Slider Value
     wearSlider.addEventListener('input', (e) => {
         const value = parseFloat(e.target.value).toFixed(4);
-        wearVal.textContent = value;
+        wearInput.value = value;
+        updateOutputs();
+    });
+
+    // Update Wear Input Value (Manual typed value)
+    wearInput.addEventListener('input', () => {
+        let value = parseFloat(wearInput.value);
+        if (isNaN(value)) return;
+        
+        const min = parseFloat(wearSlider.min);
+        const max = parseFloat(wearSlider.max);
+        
+        // Clamp typed value to current slider bounds
+        const clampedValue = Math.max(min, Math.min(max, value));
+        
+        wearSlider.value = clampedValue;
+        updateOutputs();
+    });
+
+    wearInput.addEventListener('change', () => {
+        let value = parseFloat(wearInput.value);
+        if (isNaN(value)) {
+            // Revert to current slider value if invalid/empty
+            wearInput.value = parseFloat(wearSlider.value).toFixed(4);
+            return;
+        }
+        
+        const min = parseFloat(wearSlider.min);
+        const max = parseFloat(wearSlider.max);
+        
+        // Clamp and format the input field on blur/change
+        const clampedValue = Math.max(min, Math.min(max, value));
+        wearInput.value = clampedValue.toFixed(4);
+        wearSlider.value = clampedValue;
         updateOutputs();
     });
 
@@ -242,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const clampedWear = Math.max(min, Math.min(max, wear));
             
             wearSlider.value = clampedWear;
-            wearVal.textContent = clampedWear.toFixed(4);
+            wearInput.value = clampedWear.toFixed(4);
             updateOutputs();
         });
     });
@@ -251,6 +304,25 @@ document.addEventListener('DOMContentLoaded', () => {
     [seedInput].forEach(el => {
         el.addEventListener('change', updateOutputs);
         el.addEventListener('input', updateOutputs);
+    });
+
+    // Randomize Button Clicks
+    const btnRandomSeed = document.getElementById('btn-random-seed');
+    btnRandomSeed.addEventListener('click', () => {
+        const randomSeed = Math.floor(Math.random() * 1001);
+        seedInput.value = randomSeed;
+        updateOutputs();
+    });
+
+    const btnRandomWear = document.getElementById('btn-random-wear');
+    btnRandomWear.addEventListener('click', () => {
+        const min = parseFloat(wearSlider.min);
+        const max = parseFloat(wearSlider.max);
+        const randomWear = Math.random() * (max - min) + min;
+        
+        wearSlider.value = randomWear;
+        wearInput.value = randomWear.toFixed(4);
+        updateOutputs();
     });
 
     // Update values and call generation API

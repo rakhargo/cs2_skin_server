@@ -176,14 +176,40 @@ select {
     align-items: center;
 }
 
-#wear-val {
+#wear-input {
     font-family: monospace;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #00f2fe;
     font-weight: 600;
     background: rgba(0, 242, 254, 0.08);
-    padding: 0.1rem 0.5rem;
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    padding: 0.2rem 0.6rem;
     border-radius: 6px;
+    width: 90px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -moz-appearance: textfield;
+}
+
+#wear-input::-webkit-outer-spin-button,
+#wear-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#wear-input:focus {
+    border-color: #00f2fe;
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+}
+
+.wear-cap-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    font-style: italic;
+    font-weight: 500;
 }
 
 input[type="range"] {

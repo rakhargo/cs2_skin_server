@@ -86,14 +86,81 @@ public class InspectBridge : BasePlugin
 
     public override void Load(bool hotReload)
     {
-        Console.WriteLine($"[InspectBridge] Plugin Loaded! Support for !gen (direct input) and !unlimited round enabled.");
+        Console.WriteLine($"[InspectBridge] Plugin Loaded! Support for !gen (direct input) enabled.");
 
-        // Apply unlimited round settings on server startup/plugin load
-        Server.ExecuteCommand("mp_roundtime 60");
-        Server.ExecuteCommand("mp_roundtime_defuse 60");
-        Server.ExecuteCommand("mp_roundtime_hostage 60");
-        Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
-        Server.ExecuteCommand("mp_freezetime 0");
+        // Register listener for Map Start to apply unlimited round settings
+        RegisterListener<Listeners.OnMapStart>(mapName =>
+        {
+            // Use a 5-second timer to ensure standard gamemode configs have fully loaded and executed
+            AddTimer(5.0f, () =>
+            {
+                Console.WriteLine("[InspectBridge] Applying unlimited round and zero damage settings...");
+                Server.ExecuteCommand("sv_cheats 1");
+                Server.ExecuteCommand("mp_warmuptime 0");
+                Server.ExecuteCommand("mp_warmup_end");
+                Server.ExecuteCommand("mp_freezetime 0");
+                Server.ExecuteCommand("mp_buytime 99999");
+                Server.ExecuteCommand("mp_buy_anywhere 1");
+                Server.ExecuteCommand("mp_maxmoney 60000");
+                Server.ExecuteCommand("mp_startmoney 60000");
+                Server.ExecuteCommand("mp_afterroundmoney 60000");
+                Server.ExecuteCommand("mp_limitteams 0");
+                Server.ExecuteCommand("mp_autoteambalance 0");
+                Server.ExecuteCommand("mp_autokick 0");
+                Server.ExecuteCommand("mp_respawn_on_death_ct 1");
+                Server.ExecuteCommand("mp_respawn_on_death_t 1");
+                Server.ExecuteCommand("mp_round_restart_delay 0");
+                Server.ExecuteCommand("mp_match_restart_delay 0");
+                Server.ExecuteCommand("mp_roundtime 60");
+                Server.ExecuteCommand("mp_roundtime_defuse 60");
+                Server.ExecuteCommand("mp_roundtime_hostage 60");
+                Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
+                
+                // Zero damage scaling for both teams (CT & T, body & head)
+                Server.ExecuteCommand("mp_damage_scale_ct_body 0");
+                Server.ExecuteCommand("mp_damage_scale_ct_head 0");
+                Server.ExecuteCommand("mp_damage_scale_t_body 0");
+                Server.ExecuteCommand("mp_damage_scale_t_head 0");
+                
+                Server.ExecuteCommand("mp_restartgame 1");
+            });
+        });
+
+        if (hotReload)
+        {
+            AddTimer(1.0f, () =>
+            {
+                Console.WriteLine("[InspectBridge] Hot reload detected, applying unlimited round and zero damage settings...");
+                Server.ExecuteCommand("sv_cheats 1");
+                Server.ExecuteCommand("mp_warmuptime 0");
+                Server.ExecuteCommand("mp_warmup_end");
+                Server.ExecuteCommand("mp_freezetime 0");
+                Server.ExecuteCommand("mp_buytime 99999");
+                Server.ExecuteCommand("mp_buy_anywhere 1");
+                Server.ExecuteCommand("mp_maxmoney 60000");
+                Server.ExecuteCommand("mp_startmoney 60000");
+                Server.ExecuteCommand("mp_afterroundmoney 60000");
+                Server.ExecuteCommand("mp_limitteams 0");
+                Server.ExecuteCommand("mp_autoteambalance 0");
+                Server.ExecuteCommand("mp_autokick 0");
+                Server.ExecuteCommand("mp_respawn_on_death_ct 1");
+                Server.ExecuteCommand("mp_respawn_on_death_t 1");
+                Server.ExecuteCommand("mp_round_restart_delay 0");
+                Server.ExecuteCommand("mp_match_restart_delay 0");
+                Server.ExecuteCommand("mp_roundtime 60");
+                Server.ExecuteCommand("mp_roundtime_defuse 60");
+                Server.ExecuteCommand("mp_roundtime_hostage 60");
+                Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
+                
+                // Zero damage scaling for both teams (CT & T, body & head)
+                Server.ExecuteCommand("mp_damage_scale_ct_body 0");
+                Server.ExecuteCommand("mp_damage_scale_ct_head 0");
+                Server.ExecuteCommand("mp_damage_scale_t_body 0");
+                Server.ExecuteCommand("mp_damage_scale_t_head 0");
+                
+                Server.ExecuteCommand("mp_restartgame 1");
+            });
+        }
     }
 
     [ConsoleCommand("css_gen", "Generate a skin directly in game")]
@@ -129,26 +196,7 @@ public class InspectBridge : BasePlugin
         ApplyInspectSkin(player, itemData);
     }
 
-    [ConsoleCommand("css_unlimited", "Make the round time unlimited and restart game")]
-    [ConsoleCommand("css_u", "Make the round time unlimited and restart game")]
-    public void OnUnlimitedCommand(CCSPlayerController? player, CommandInfo command)
-    {
-        Server.ExecuteCommand("mp_roundtime 60");
-        Server.ExecuteCommand("mp_roundtime_defuse 60");
-        Server.ExecuteCommand("mp_roundtime_hostage 60");
-        Server.ExecuteCommand("mp_ignore_round_win_conditions 1");
-        Server.ExecuteCommand("mp_freezetime 0");
-        Server.ExecuteCommand("mp_restartgame 1");
 
-        if (player != null && player.IsValid)
-        {
-            player.PrintToChat(" \x06[Inspect]\x01 Unlimited round time applied and game restarted!");
-        }
-        else
-        {
-            Console.WriteLine("[InspectBridge] Unlimited round time applied and game restarted!");
-        }
-    }
 
     [ConsoleCommand("css_inspect_target", "Inspect a skin directly on a target player (for Web UI via RCON)")]
     public void OnInspectTargetCommand(CCSPlayerController? caller, CommandInfo command)

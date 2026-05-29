@@ -1,91 +1,88 @@
-# CS2 Skin Inspect Server & Web UI Generator
+# CS2 Skin Inspect Server and Web UI Generator
 
-A local, lightweight utility to inspect and generate custom skins in Counter-Strike 2. This project features a C# server plugin (built with CounterStrikeSharp) and a Node.js web server that acts as a Steam inspect decoder and provides a premium web interface for customizing and sending skins directly to your local CS2 Dedicated Server.
+A lightweight Counter-Strike 2 inspect server utility and modern web dashboard. This project bridges a C# server plugin (built with CounterStrikeSharp and .NET 8) and a Node.js web server to allow players to customize, preview, and generate weapon skins or knives in-game instantly with high precision and accurate visual fidelity.
+
+---
 
 ## Features
 
-- **In-game Chat Commands**: Spawns skins instantly using `!gen <defindex> <paintindex> <paintseed> <paintwear>` or `!i <inspect_link>`.
-- **Skins Preset Database**: Features a dropdown autocomplete search list with **1,980+ official weapon and knife skins** (automatically synced via Steam/ByMykel CS2 API).
-- **Visual Preview Card**: Instantly previews your customized skin, complete with high-resolution weapon thumbnails retrieved from the Steam community CDN.
-- **Wear Float Clamping**: Automatically clamps the float sliders to match each skin's official wear boundaries (e.g. *AWP | Asiimov* float is capped from `0.18` to `1.00`).
-- **RCON Direct Spawning**: Enter your SteamID64 and click "Send to Server" to instantly spawn the customized skin in your hand—no copy-pasting required!
-- **Offline Mode fallback**: The inspect server decodes links offline using protobufs, allowing you to use the generator and manually paste commands even if your Steam bot credentials are not configured.
+* **In-Game Chat Commands**: Spawn customized weapon skins or knives instantly in-game using `!gen <defindex> <paintindex> <paintseed> <paintwear>`.
+* **High-Precision Wear Rating**: Supports up to 14 decimal places (e.g., `0.18000000000000`) for wear floats, letting players simulate precise collector-grade wear values.
+* **1,980+ Official Skins Database**: Includes a built-in search and autocomplete dropdown menu with high-resolution weapon images, matching official paint kit IDs and wear boundaries automatically.
+* **Legacy CS:GO Paint Kit Compatibility**: Automatically toggles the weapon bodygroup to the legacy model mesh (`body,1`) for paint kits below ID 1150 (such as Asiimov or Case Hardened) to ensure correct texture UV mapping and accurate visual rendering.
+* **Cross-Locale Float Parsing**: Parses float values using invariant culture, ensuring the plugin runs seamlessly on host servers configured with different regional number formatting (where commas are used as decimal separators).
+* **Automated Practice Sandbox**: Configures the game server settings on map start to set up the ultimate inspect environment (enables cheats, 60-minute rounds, buy anywhere, infinite money, and scales player damage to 0 to prevent combat).
+* **Offline-First Protobuf Encoder**: Encodes skin parameters into a valid Steam inspect link offline using protobufs, allowing the generator to work instantly without needing Steam account credentials.
 
 ---
 
 ## Repository Structure
 
 ```text
-├── public/                  # Static Web UI frontend files
-│   ├── index.html           # Beautiful dark-themed Web UI
-│   ├── style.css            # Responsive layout & custom glassmorphic styling
-│   ├── app.js               # Frontend event handling, search filtering & RCON caller
-│   └── skins.json           # Filtered CS2 weapons and skins metadata database
-├── InspectBridge.cs         # CounterStrikeSharp C# Server Plugin Source Code
-├── InspectBridge.csproj      # C# Project File for compiling the plugin
-├── server.js                # Node.js backend inspect bot & RCON API server
-├── .env.example             # Configuration template for port, Steam credentials, and RCON
-├── .gitignore               # Configured to prevent committing sensitive files & build outputs
-└── package.json             # Node.js dependencies (steam-user, rcon-client, express, etc.)
+├── public/                  # Web Dashboard Frontend
+│   ├── index.html           # Glassmorphic, modern dark-themed user interface
+│   ├── style.css            # Responsive styles and micro-animations
+│   ├── app.js               # Event handling, autocomplete search, and API calls
+│   └── skins.json           # Local cache of 1,980+ official CS2 weapon skins
+├── InspectBridge.cs         # CounterStrikeSharp C# Plugin (Server-side logic)
+├── InspectBridge.csproj      # .NET 8 Project file for compilation
+├── server.js                # Node.js backend (Static host & offline inspect API)
+├── .env.example             # Environment configuration file template
+└── package.json             # Backend dependencies (express, cs2-inspect-lib, etc.)
 ```
 
 ---
 
-## Setup & Installation
+## Installation & Setup
 
-### Step 1: CS2 Dedicated Server Prerequisites
-1. Ensure your local CS2 Dedicated Server is running and has **Metamod:Source** and **CounterStrikeSharp** installed.
-2. If not, follow the official installation guides:
-   - [Metamod:Source Downloads](https://www.metamodsource.net/downloads.php?branch=master)
-   - [CounterStrikeSharp Releases](https://github.com/roflmuffin/CounterStrikeSharp/releases) (Ensure you download the version `with-runtime` for your OS).
+### 1. CS2 Server Prerequisites
+Make sure your CS2 Dedicated Server has Metamod:Source and CounterStrikeSharp (CSS) installed.
+* [Metamod:Source](https://www.metamodsource.net/downloads.php?branch=master)
+* [CounterStrikeSharp](https://github.com/roflmuffin/CounterStrikeSharp/releases) (Ensure you grab the version with-runtime).
 
-### Step 2: Compile & Deploy the C# Plugin
-1. Install [.NET SDK 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) on your machine.
-2. In the project root directory, run the compile command:
+### 2. Compile and Deploy the C# Plugin
+1. Install [.NET SDK 8.0](https://dotnet.microsoft.com/download/dotnet/8.0).
+2. Open a terminal in the project root and run:
    ```bash
    dotnet build
    ```
-3. Copy the compiled plugin files from `bin/Debug/net8.0/` into your server's plugin directory:
-   `C:\cs2_server\game\csgo\addons\counterstrikesharp\plugins\InspectBridge\`
-   - Copy `InspectBridge.dll`
-   - Copy `InspectBridge.deps.json`
-   - Copy `InspectBridge.pdb`
-4. **IMPORTANT**: Make sure there is no `InspectBridge.cs` file left in the server's `/InspectBridge/` folder to prevent dynamic compilation conflicts.
+3. Copy the compiled files from `bin/Debug/net8.0/` into your server's plugin directory:
+   `D:\cs2_server\game\csgo\addons\counterstrikesharp\plugins\InspectBridge\`
+   * Copy `InspectBridge.dll`
+   * Copy `InspectBridge.deps.json`
+   * Copy `InspectBridge.pdb`
+4. *Note: Ensure no `InspectBridge.cs` file is left in the server plugin directory to avoid compiler conflicts.*
 
-### Step 3: Configure the Web Backend
-1. Install [Node.js](https://nodejs.org/) (version 18+).
-2. In the project directory, install the required dependencies:
+### 3. Run the Node.js Web Dashboard
+1. Install [Node.js](https://nodejs.org/) (v18+).
+2. Install dependencies:
    ```bash
    npm install
    ```
-3. Duplicate the `.env.example` file and rename it to `.env`:
+3. Duplicate `.env.example` and name it `.env`:
    ```bash
    copy .env.example .env
    ```
-4. Open `.env` and fill in the configuration:
-   - `PORT`: Node server port (default: `3000`).
-   - `STEAM_USERNAME` / `STEAM_PASSWORD`: (Optional) Steam account credentials if you want to connect to Steam Game Coordinator to inspect real market/inventory links. Leave as placeholders to run in offline generator mode.
-   - `RCON_HOST`, `RCON_PORT`, `RCON_PASSWORD`: Your CS2 server RCON details (used for the "Send to Server" instant spawn button).
-
-### Step 4: Run the Backend
-Start the Node.js backend server:
-```bash
-npm start
-```
-Open **`http://localhost:3000`** in your browser (or inside the Steam overlay browser).
-
-### Step 5: Start CS2 and Test
-1. Start your CS2 Dedicated Server with RCON enabled:
+4. Start the server:
    ```bash
-   cd cs2_server\game\bin\win64
-   cs2.exe -dedicated -console +map de_mirage +rcon_password your_rcon_password
+   npm start
    ```
-2. Connect to the server in-game.
-3. Open `http://localhost:3000`, customize a skin, and:
-   - **Method A**: Copy the **Direct Chat Command** (e.g. `!gen 7 44 661 0.05`) and paste it into the game chat.
-   - **Method B**: Input your SteamID64 and click **Send to Server** to see it equip instantly!
+5. Open your browser and navigate to `http://localhost:3000` (or open it in the Steam Overlay browser in-game).
+
+---
+
+## How to Use in Game
+
+1. Connect to your local or private CS2 dedicated server (e.g., `connect localhost:27015`).
+2. Open the Web UI (`http://localhost:3000`).
+3. Search for a skin (e.g., "Asiimov" or "Case Hardened"), adjust the seed/wear, and click **Copy** next to **Gencode In-Game Chat Command**.
+4. In-game, press your chat key (default: `Y`) and paste the command (e.g., `!gen 7 44 661 0.05000000000000`).
+5. The server plugin automatically:
+   * Identifies the category slot (Primary, Pistol, Knife, or Zeus).
+   * Safely clears any existing weapon in that slot.
+   * Spawns the new weapon, configures its attributes, applies the legacy 3D mesh if necessary, and forces the player to equip it.
 
 ---
 
 ## Disclaimer
-Using plugins to modify weapon skins and knives on public servers may violate Valve's Game Server Login Token (GSLT) rules and can result in server bans. This plugin is designed for local, offline, or private testing/practice purposes only. Use at your own risk.
+Modifying weapon skins on public game coordinator-connected servers can violate Valve's Game Server Login Token (GSLT) rules. This utility is designed strictly for local testing, private sandbox environments, and educational/practice purposes. Use responsibly.

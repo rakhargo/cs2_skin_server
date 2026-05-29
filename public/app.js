@@ -116,24 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
         skinDropdownList.classList.add('hidden');
         
         // Adjust wear input/slider limits to match skin's official floats
-        wearInput.min = skin.min_float.toFixed(4);
-        wearInput.max = skin.max_float.toFixed(4);
-        wearSlider.min = skin.min_float.toFixed(4);
-        wearSlider.max = skin.max_float.toFixed(4);
+        wearInput.min = skin.min_float.toFixed(14);
+        wearInput.max = skin.max_float.toFixed(14);
+        wearSlider.min = skin.min_float.toFixed(14);
+        wearSlider.max = skin.max_float.toFixed(14);
         
         // Update range note text
-        wearCapNote.textContent = `Range: ${skin.min_float.toFixed(4)} - ${skin.max_float.toFixed(4)} (${skin.pattern_name})`;
+        wearCapNote.textContent = `Range: ${skin.min_float.toFixed(14)} - ${skin.max_float.toFixed(14)} (${skin.pattern_name})`;
         
         // Clamp current wear value to match the new bounds if necessary
         let currentWear = parseFloat(wearSlider.value);
         if (currentWear < skin.min_float) {
             wearSlider.value = skin.min_float;
-            wearInput.value = skin.min_float.toFixed(4);
+            wearInput.value = skin.min_float.toFixed(14);
         } else if (currentWear > skin.max_float) {
             wearSlider.value = skin.max_float;
-            wearInput.value = skin.max_float.toFixed(4);
+            wearInput.value = skin.max_float.toFixed(14);
         } else {
-            wearInput.value = currentWear.toFixed(4);
+            wearInput.value = currentWear.toFixed(14);
         }
 
         updatePreviewCard(skin);
@@ -150,22 +150,22 @@ document.addEventListener('DOMContentLoaded', () => {
             skinSearchInput.value = matchingSkin.pattern_name;
             updatePreviewCard(matchingSkin);
             
-            wearInput.min = matchingSkin.min_float.toFixed(4);
-            wearInput.max = matchingSkin.max_float.toFixed(4);
-            wearSlider.min = matchingSkin.min_float.toFixed(4);
-            wearSlider.max = matchingSkin.max_float.toFixed(4);
+            wearInput.min = matchingSkin.min_float.toFixed(14);
+            wearInput.max = matchingSkin.max_float.toFixed(14);
+            wearSlider.min = matchingSkin.min_float.toFixed(14);
+            wearSlider.max = matchingSkin.max_float.toFixed(14);
             
-            wearCapNote.textContent = `Range: ${matchingSkin.min_float.toFixed(4)} - ${matchingSkin.max_float.toFixed(4)} (${matchingSkin.pattern_name})`;
+            wearCapNote.textContent = `Range: ${matchingSkin.min_float.toFixed(14)} - ${matchingSkin.max_float.toFixed(14)} (${matchingSkin.pattern_name})`;
         } else {
             skinSearchInput.value = '';
             clearPreviewCard();
             
-            wearInput.min = "0.0000";
-            wearInput.max = "1.0000";
-            wearSlider.min = "0.0000";
-            wearSlider.max = "1.0000";
+            wearInput.min = "0.00000000000000";
+            wearInput.max = "1.00000000000000";
+            wearSlider.min = "0.00000000000000";
+            wearSlider.max = "1.00000000000000";
             
-            wearCapNote.textContent = "Range: 0.0000 - 1.0000 (Default)";
+            wearCapNote.textContent = "Range: 0.00000000000000 - 1.00000000000000 (Default)";
         }
 
         updateOutputs();
@@ -203,12 +203,12 @@ document.addEventListener('DOMContentLoaded', () => {
         clearPreviewCard();
         
         // Reset slider and input bounds
-        wearInput.min = "0.0000";
-        wearInput.max = "1.0000";
-        wearSlider.min = "0.0000";
-        wearSlider.max = "1.0000";
+        wearInput.min = "0.00000000000000";
+        wearInput.max = "1.00000000000000";
+        wearSlider.min = "0.00000000000000";
+        wearSlider.max = "1.00000000000000";
         
-        wearCapNote.textContent = "Range: 0.0000 - 1.0000 (Default)";
+        wearCapNote.textContent = "Range: 0.00000000000000 - 1.00000000000000 (Default)";
         
         filterSkinsForSelectedWeapon();
         updateOutputs();
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update Wear Slider Value
     wearSlider.addEventListener('input', (e) => {
-        const value = parseFloat(e.target.value).toFixed(4);
+        const value = parseFloat(e.target.value).toFixed(14);
         wearInput.value = value;
         updateOutputs();
     });
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let value = parseFloat(wearInput.value);
         if (isNaN(value)) {
             // Revert to current slider value if invalid/empty
-            wearInput.value = parseFloat(wearSlider.value).toFixed(4);
+            wearInput.value = parseFloat(wearSlider.value).toFixed(14);
             return;
         }
         
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Clamp and format the input field on blur/change
         const clampedValue = Math.max(min, Math.min(max, value));
-        wearInput.value = clampedValue.toFixed(4);
+        wearInput.value = clampedValue.toFixed(14);
         wearSlider.value = clampedValue;
         updateOutputs();
     });
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const clampedWear = Math.max(min, Math.min(max, wear));
             
             wearSlider.value = clampedWear;
-            wearInput.value = clampedWear.toFixed(4);
+            wearInput.value = clampedWear.toFixed(14);
             updateOutputs();
         });
     });
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomWear = Math.random() * (max - min) + min;
         
         wearSlider.value = randomWear;
-        wearInput.value = randomWear.toFixed(4);
+        wearInput.value = randomWear.toFixed(14);
         updateOutputs();
     });
 
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const paintwear = parseFloat(wearSlider.value);
 
         // Update local text box immediately (Offline Command)
-        genCommandDiv.textContent = `!gen ${defindex} ${paintindex} ${paintseed} ${paintwear.toFixed(4)}`;
+        genCommandDiv.textContent = `!gen ${defindex} ${paintindex} ${paintseed} ${paintwear.toFixed(14)}`;
 
         // Debounce API calls for the masked inspect link to avoid spamming the backend
         clearTimeout(debounceTimer);

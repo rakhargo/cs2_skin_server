@@ -179,7 +179,7 @@ public class InspectBridge : BasePlugin
         if (!int.TryParse(command.ArgByIndex(1), out int defIndex) ||
             !int.TryParse(command.ArgByIndex(2), out int paintIndex) ||
             !int.TryParse(command.ArgByIndex(3), out int paintSeed) ||
-            !float.TryParse(command.ArgByIndex(4), out float paintWear))
+            !double.TryParse(command.ArgByIndex(4), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double paintWear))
         {
             player.PrintToChat(" \x02[Inspect]\x01 Invalid parameters. Ensure parameters 1-4 are numeric.");
             return;
@@ -218,7 +218,7 @@ public class InspectBridge : BasePlugin
         if (!int.TryParse(command.ArgByIndex(2), out int defIndex) ||
             !int.TryParse(command.ArgByIndex(3), out int paintIndex) ||
             !int.TryParse(command.ArgByIndex(4), out int paintSeed) ||
-            !float.TryParse(command.ArgByIndex(5), out float paintWear))
+            !double.TryParse(command.ArgByIndex(5), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double paintWear))
         {
             Console.WriteLine("[InspectBridge] Invalid skin arguments.");
             return;
@@ -409,10 +409,14 @@ public class InspectBridge : BasePlugin
             targetWeapon.FallbackSeed = data.paintseed;
             targetWeapon.FallbackWear = (float)data.paintwear;
 
+            // Enforce legacy (CS:GO) or new (CS2) model bodygroup mesh
+            bool isLegacy = data.paintindex > 0 && data.paintindex < 1150;
+            targetWeapon.AcceptInput("SetBodygroup", null, null, $"body,{(isLegacy ? 1 : 0)}");
+
             // Force the player's client to equip the slot, drawing the new model & skin
             player.ExecuteClientCommand(slotCmd);
 
-            player.PrintToChat($" \x06[Inspect]\x01 Skin applied! Paint: \x04{data.paintindex}\x01 | Seed: \x04{data.paintseed}\x01 | Float: \x04{data.paintwear:F5}");
+            player.PrintToChat($" \x06[Inspect]\x01 Skin applied! Paint: \x04{data.paintindex}\x01 | Seed: \x04{data.paintseed}\x01 | Float: \x04{data.paintwear.ToString("F14", System.Globalization.CultureInfo.InvariantCulture)}");
         });
     }
 }
